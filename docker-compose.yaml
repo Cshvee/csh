@@ -1,0 +1,51 @@
+services:
+  backend:
+    build: ./backend
+    container_name: training-agent-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=training_agent
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD:-training_agent_password}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - DATA_DIR=/app/events_kg/input/就业市场数据(2)
+      - KG_STORAGE=json
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_graphs:/app/data/graphs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: training-agent-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-training_agent_password}
+      - MYSQL_DATABASE=training_agent
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build: ./frontend
+    container_name: training-agent-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  backend_uploads:
+  backend_graphs:

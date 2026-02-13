@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+pydantic-settings
+openai
+pandas
+python-docx
+pypdf
+python-multipart
+httpx
+pyyaml
+sqlalchemy
+pymysql
+cryptography
+alembic
+aiofiles
+python-jose
+neo4j
